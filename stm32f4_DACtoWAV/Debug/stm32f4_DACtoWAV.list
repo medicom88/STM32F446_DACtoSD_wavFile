@@ -23,23 +23,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
   9 .ARM.attributes 00000030  00000000  00000000  000200d8  2**0
                   CONTENTS, READONLY
- 10 .debug_info   000304db  00000000  00000000  00020108  2**0
+ 10 .debug_info   0003050e  00000000  00000000  00020108  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_abbrev 00005760  00000000  00000000  000505e3  2**0
+ 11 .debug_abbrev 00005760  00000000  00000000  00050616  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_loc    000124e5  00000000  00000000  00055d43  2**0
+ 12 .debug_loc    000124e5  00000000  00000000  00055d76  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_aranges 00001288  00000000  00000000  00068228  2**3
+ 13 .debug_aranges 00001288  00000000  00000000  00068260  2**3
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_ranges 00001a80  00000000  00000000  000694b0  2**3
+ 14 .debug_ranges 00001a80  00000000  00000000  000694e8  2**3
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_line   0000bb87  00000000  00000000  0006af30  2**0
+ 15 .debug_line   0000bb7e  00000000  00000000  0006af68  2**0
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_str    000067a5  00000000  00000000  00076ab7  2**0
+ 16 .debug_str    000067d8  00000000  00000000  00076ae6  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .comment      0000007c  00000000  00000000  0007d25c  2**0
+ 17 .comment      0000007c  00000000  00000000  0007d2be  2**0
                   CONTENTS, READONLY
- 18 .debug_frame  00003f20  00000000  00000000  0007d2d8  2**2
+ 18 .debug_frame  00003f20  00000000  00000000  0007d33c  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -12881,8 +12881,6 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr)
  80054d4:	b510      	push	{r4, lr}
 	int WaveFile_OK = 0;
 
-//	sd_FileRead("test_music.wav", (char *)WavHdrData, sizeof(WavHdrData));
-
 	sd_FileRead("test_music.wav", hWavehdr, sizeof(WAVE_HDR__TypeDef));
  80054d6:	4601      	mov	r1, r0
 {
@@ -12891,11 +12889,7 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr)
  80054da:	222c      	movs	r2, #44	; 0x2c
  80054dc:	482c      	ldr	r0, [pc, #176]	; (8005590 <WaveFile_HDR_Read+0xbc>)
  80054de:	f000 fbdb 	bl	8005c98 <sd_FileRead>
-//
-//	sd_FileRead("test_music.wav", (char *)WavHdrData, sizeof(WavHdrData));
 
-
-//	WaveFile_OK = memcmp((unsigned char *)hWavehdr->Riff.ChunkID, (unsigned char *)WavHdrData, 4);
 	WaveFile_OK = memcmp((unsigned char *)hWavehdr->Riff.ChunkID, "RIFF", 4);
  80054e2:	2204      	movs	r2, #4
  80054e4:	492b      	ldr	r1, [pc, #172]	; (8005594 <WaveFile_HDR_Read+0xc0>)
@@ -12905,11 +12899,6 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr)
 	if(WaveFile_OK == NONE_ERROR){
  80054ec:	2800      	cmp	r0, #0
  80054ee:	d146      	bne.n	800557e <WaveFile_HDR_Read+0xaa>
-//		hWavehdr->Riff.ChunkSize |= (*(WavHdrData+5)<<8);
-//		hWavehdr->Riff.ChunkSize |= *(WavHdrData+4);
-//
-		//file total size : hWavehdr->Riff.ChunkSize + 8byte
-
 		put_str(&huart1, (uint8_t *)"RIFF_OK\n");
  80054f0:	4929      	ldr	r1, [pc, #164]	; (8005598 <WaveFile_HDR_Read+0xc4>)
 	}
@@ -12919,7 +12908,6 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr)
  80054f4:	f000 fe28 	bl	8006148 <put_str>
 	}
 
-//	WaveFile_OK = memcmp((unsigned char *)hWavehdr->Riff.Format, (unsigned char *)(WavHdrData+8), 4);
 	WaveFile_OK = memcmp((unsigned char *)hWavehdr->Riff.Format, "WAVE", 4);
  80054f8:	2204      	movs	r2, #4
  80054fa:	4929      	ldr	r1, [pc, #164]	; (80055a0 <WaveFile_HDR_Read+0xcc>)
@@ -12938,7 +12926,6 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr)
  800550c:	f000 fe1c 	bl	8006148 <put_str>
 	}
 
-//	WaveFile_OK = memcmp((unsigned char *)hWavehdr->Fmt.ChunkID, (unsigned char *)(WavHdrData+12), 4);
 	WaveFile_OK = memcmp((unsigned char *)hWavehdr->Fmt.ChunkID, "fmt ", 4);
  8005510:	2204      	movs	r2, #4
  8005512:	4925      	ldr	r1, [pc, #148]	; (80055a8 <WaveFile_HDR_Read+0xd4>)
@@ -12948,10 +12935,6 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr)
 	if(WaveFile_OK == NONE_ERROR){
  800551c:	2800      	cmp	r0, #0
  800551e:	d132      	bne.n	8005586 <WaveFile_HDR_Read+0xb2>
-//		hWavehdr->Fmt.ChunkSize |= *(WavHdrData+16);
-//
-//		hWavehdr->Fmt.AudioFormat = (*(WavHdrData+21)<<8);
-//		hWavehdr->Fmt.AudioFormat |= *(WavHdrData+20);
 
 		if(hWavehdr->Fmt.AudioFormat != WAVE_FORMAT_PCM){
  8005520:	8aa3      	ldrh	r3, [r4, #20]
@@ -12963,9 +12946,6 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr)
  800552a:	481c      	ldr	r0, [pc, #112]	; (800559c <WaveFile_HDR_Read+0xc8>)
  800552c:	f000 fe0c 	bl	8006148 <put_str>
 		}
-
-//		hWavehdr->Fmt.NumChannels = (*(WavHdrData+23)<<8);
-//		hWavehdr->Fmt.NumChannels |= *(WavHdrData+22);
 
 		if(hWavehdr->Fmt.NumChannels == WAVE_FORMAT_MONO){
  8005530:	8ae3      	ldrh	r3, [r4, #22]
@@ -12986,10 +12966,7 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr)
  8005540:	491b      	ldr	r1, [pc, #108]	; (80055b0 <WaveFile_HDR_Read+0xdc>)
  8005542:	4816      	ldr	r0, [pc, #88]	; (800559c <WaveFile_HDR_Read+0xc8>)
  8005544:	f000 fe00 	bl	8006148 <put_str>
-//		hWavehdr->Fmt.AvgByteRate |= *(WavHdrData+28);
-//
-//		hWavehdr->Fmt.BlockAlign = (*(WavHdrData+33)<<8);
-//		hWavehdr->Fmt.BlockAlign |= *(WavHdrData+32);
+		}
 
 		if(hWavehdr->Fmt.NumChannels != hWavehdr->Fmt.BlockAlign){
  8005548:	8ae2      	ldrh	r2, [r4, #22]
@@ -13004,9 +12981,6 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr)
  8005558:	f000 fdf6 	bl	8006148 <put_str>
 		}
 
-//		hWavehdr->Fmt.BitPerSample = (*(WavHdrData+35)<<8);
-//		hWavehdr->Fmt.BitPerSample |= *(WavHdrData+34);
-
 		put_str(&huart1, (uint8_t *)"FMT_OK\n");
  800555c:	4916      	ldr	r1, [pc, #88]	; (80055b8 <WaveFile_HDR_Read+0xe4>)
 	}
@@ -13016,7 +12990,6 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr)
  8005560:	f000 fdf2 	bl	8006148 <put_str>
 	}
 
-//	WaveFile_OK = memcmp((unsigned char *)hWavehdr->Data.ChunkID, (unsigned char *)(WavHdrData+36), 4);
 	WaveFile_OK = memcmp((unsigned char *)hWavehdr->Data.ChunkID, "data", 4);
  8005564:	2204      	movs	r2, #4
  8005566:	4915      	ldr	r1, [pc, #84]	; (80055bc <WaveFile_HDR_Read+0xe8>)
@@ -13025,11 +12998,6 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr)
 
 	if(WaveFile_OK == NONE_ERROR){
  8005570:	b958      	cbnz	r0, 800558a <WaveFile_HDR_Read+0xb6>
-//		hWavehdr->Data.ChunkSize = (*(WavHdrData+43)<<24);
-//		hWavehdr->Data.ChunkSize |= (*(WavHdrData+42)<<16);
-//		hWavehdr->Data.ChunkSize |= (*(WavHdrData+41)<<8);
-//		hWavehdr->Data.ChunkSize |= *(WavHdrData+40);
-
 		put_str(&huart1, (uint8_t *)"DATA_OK\n");
  8005572:	4913      	ldr	r1, [pc, #76]	; (80055c0 <WaveFile_HDR_Read+0xec>)
 	}
