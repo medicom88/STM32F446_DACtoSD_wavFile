@@ -13,6 +13,7 @@
 
 extern SD_HandleTypeDef hsd;
 
+extern FRESULT	res;
 extern FATFS 	myFatFS;
 extern FIL		myFiles;
 extern UINT		myWriteBytes;

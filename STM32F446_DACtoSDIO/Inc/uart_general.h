@@ -19,6 +19,8 @@
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart4;
 
+extern unsigned char UartTestStr[256];
+
 typedef struct
 {
 	uint8_t txStr[256];

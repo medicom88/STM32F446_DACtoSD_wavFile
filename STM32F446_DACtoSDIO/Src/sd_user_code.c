@@ -7,9 +7,10 @@
 #include "sd_user_code.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "uart_general.h"
 /* USER CODE END Includes */
 
+FRESULT	res;
 FATFS 	myFatFS;
 FIL		myFiles;
 UINT	myWriteBytes;
@@ -30,13 +31,11 @@ void sd_FileWrite(
 		UINT DataSize				/* Number of bytes to write */
 )
 {
-	if(f_mount(&myFatFS, SDPath, 1) == FR_OK)
-	{
 		if(f_open(&myFiles, pathFile, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
 		{
 			if(f_write(&myFiles, writeData, DataSize, &myWriteBytes) == FR_OK)
 			{
-				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_7);
+				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_6);
 			}
 			else{
 				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
@@ -46,10 +45,6 @@ void sd_FileWrite(
 		else{
 			HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_9);
 		}
-	}
-	else{
-		HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_10);
-	}
 }
 
 //sd card read
@@ -59,24 +54,18 @@ void sd_FileRead(
 		UINT DataSize				/* Number of bytes to read */
 )
 {
-	if(f_mount(&myFatFS, SDPath, 0) == FR_OK)
-	{
-		HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_6);
-
 		if(f_open(&myFiles, pathFile, FA_READ) == FR_OK)
 		{
-			HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_7);
 
 			if(f_read(&myFiles, ReadData, DataSize, &myReadBytes) == FR_OK)
 			{
-				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_9);
+				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_7);
 			}
 			f_close(&myFiles);
 		}
-	}
-	else{
-		HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_10);
-	}
+		else{
+			HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_9);
+		}
 }
 
 ////sd card로 txt 파일의 hex code를 읽어 LCD에 표시

@@ -179,6 +179,9 @@ int main(void)
   //SinWave test
 //  	SinWave(4096, 100, mainTestArr);
 
+  	f_mount(&myFatFS, SDPath, 0);
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

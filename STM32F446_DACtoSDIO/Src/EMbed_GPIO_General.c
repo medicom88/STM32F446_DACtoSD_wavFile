@@ -56,7 +56,7 @@ void BT_SHORT_Event(unsigned char bt_state)
 //			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_2);
 //			sd_FileRead("test_music.wav", myReadData, 44);
 
-			WaveFile_HDR_Read(&WaveHdr);
+			WaveFile_HDR_Read(&WaveHdr, "test_music.wav");
 //			put_str_size(&huart1, myReadData, 44);
 		break;
 		case 0x1B :		//0b xxx1 1011

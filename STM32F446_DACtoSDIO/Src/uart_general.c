@@ -14,6 +14,8 @@
 UART_GENERAL_TypeDef uart1_general;
 UART_GENERAL_TypeDef uart4_general;
 
+unsigned char UartTestStr[256] = {0,};
+
 uint8_t	BLE_Response[2] = "OK";
 
 void GENERAL_UART_IT_Init(UART_HandleTypeDef *huartx)
