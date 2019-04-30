@@ -192,7 +192,7 @@ int main(void)
   //SinWave test
   	SinWave(4096, 100, mainTestArr);
 
-
+ // 	f_mount(&SDFatFS, SDPath, 1);
 
   //
 
@@ -208,6 +208,9 @@ int main(void)
 	  GPIO_BT_READ(&hButton);
     /* USER CODE END WHILE */
 
+	  sd_FileWrite(myFileName, myWriteData, sizeof(myWriteData));
+
+	  HAL_Delay(2500);
 //	for(int i=0; i<100; i++){
 //	//  		sprintf(mainTestStr, "%d\r\n", mainTestArr[i]);
 //	//  		put_str(&huart1, mainTestStr);

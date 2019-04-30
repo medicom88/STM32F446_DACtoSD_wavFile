@@ -14,7 +14,7 @@ FATFS 	myFatFS;
 FIL		myFiles;
 UINT	myWriteBytes;
 UINT	myReadBytes;
-char myFileName[] = "SDCard_Test_10.txt";
+char myFileName[] = "SD_13.txt";
 char myWriteData[83] = "Hello from STM32F4 Disco, SDIO in 4 bits mode + DMA + RTOS + FileNameHeap";
 
 volatile char myReadData[320] ={0,};
@@ -34,7 +34,7 @@ void sd_FileWrite(
 	{
 		HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_6);
 
-		if(f_open(&myFiles, pathFile, FA_WRITE | FA_CREATE_ALWAYS) == FR_OK)
+		if(f_open(&myFiles, pathFile, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
 		{
 			HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_7);
 
@@ -42,7 +42,13 @@ void sd_FileWrite(
 			{
 				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
 			}
+			else{
+				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_9);
+			}
 			f_close(&myFiles);
+		}
+		else{
+			HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_10);
 		}
 	}
 	else{
@@ -57,7 +63,7 @@ void sd_FileRead(
 		UINT DataSize				/* Number of bytes to read */
 )
 {
-	if(f_mount(&myFatFS, SDPath, 1) == FR_OK)
+	if(f_mount(&myFatFS, SDPath, 0) == FR_OK)
 	{
 		HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_6);
 
