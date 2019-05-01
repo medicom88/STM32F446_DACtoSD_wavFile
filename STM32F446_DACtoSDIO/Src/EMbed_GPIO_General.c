@@ -50,7 +50,8 @@ void BT_SHORT_Event(unsigned char bt_state)
 	switch(bt_state){
 		case 0x1E :		//0b xxx1 1110
 //			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_1);
-			sd_FileWrite(myFileName, myWriteData, sizeof(myWriteData));
+//			sd_FileWrite(myFileName, myWriteData, sizeof(myWriteData));
+			WaveFile_HDR_Read(&WaveHdr, "test_music.wav");
 		break;
 		case 0x1D :		//0b xxx1 1101
 //			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_2);

@@ -31,16 +31,22 @@
 
 #define PI	3.141592
 
+#define WAV_4KBYTE	4000
+
+#define ENABLE_FLAG_BIT		1
+#define DISABLE_FLAG_BIT	0
+
 
 extern DAC_HandleTypeDef hdac;
 
 typedef struct{
-	unsigned char Wav4K_buff_L[30000];
-	unsigned char Wav4K_buff_H[4000];
-	unsigned char WavHdrClearFlag;
-	unsigned char WavOperateDataFlag;
-	unsigned char WavRepeatDataFlag;
-	unsigned char WavClearDataFlag;
+	unsigned char 	WavData[4000];
+	unsigned short	WavDataSize;
+	unsigned char 	WavHdrClearFlag;
+	unsigned char 	WavOperateDataFlag;
+	unsigned char 	WavRepeatDataFlag;
+	unsigned char 	WavClearDataFlag;
+	unsigned char 	WavLasRepeattDataFlag;
 }WAV_DATA_TypeDef;
 
 

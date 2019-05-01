@@ -25,6 +25,7 @@ volatile WAV_DATA_TypeDef	WaveData;
 
 void WaveFile_Hdr_Var_Init(volatile WAVE_HDR__TypeDef *hWavehdr)
 {
+	memset(hWavehdr, NULL, sizeof(WAVE_HDR__TypeDef));
 	memcpy((unsigned char *)hWavehdr->Riff.ChunkID, "RIFF", 4);
 	memcpy((unsigned char *)hWavehdr->Riff.Format, "WAVE", 4);
 	memcpy((unsigned char *)hWavehdr->Fmt.ChunkID, "fmt ", 4);
@@ -106,9 +107,14 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr, const TCHAR* pathFi
 //
 //			f_close(&myFiles);
 
-			WaveData.WavHdrClearFlag = 1;
-			WaveData.WavClearDataFlag = 0;
-			WaveData.WavRepeatDataFlag = 0;
+			WaveData.WavHdrClearFlag		= ENABLE_FLAG_BIT;
+			WaveData.WavRepeatDataFlag 		= ENABLE_FLAG_BIT;
+			WaveData.WavLasRepeattDataFlag	= DISABLE_FLAG_BIT;
+			WaveData.WavClearDataFlag 		= DISABLE_FLAG_BIT;
+
+			WaveData.WavDataSize = WAV_4KBYTE;
+
+			HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_7);
 		}
 		else{
 			HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_9);
@@ -121,11 +127,11 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr, const TCHAR* pathFi
 
 void WaveDataRead()
 {
-	if(WaveData.WavHdrClearFlag == 1){
-		if(WaveData.WavRepeatDataFlag == 0){
-			if(f_read(&myFiles, WaveData.Wav4K_buff_L, 30000, &myReadBytes) == FR_OK){
+	if(WaveData.WavHdrClearFlag == ENABLE_FLAG_BIT){
+		if(WaveData.WavRepeatDataFlag == ENABLE_FLAG_BIT){
+			if(f_read(&myFiles, WaveData.WavData, WaveData.WavDataSize, &myReadBytes) == FR_OK){
 				//put_str(&huart1, WaveData.Wav4K_buff_L);
-				WaveData.WavRepeatDataFlag = 1;
+				WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
 			}
 			else{
 				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
@@ -133,8 +139,10 @@ void WaveDataRead()
 		}
 	}
 
-	if(WaveData.WavClearDataFlag == 1){
+	if(WaveData.WavClearDataFlag == ENABLE_FLAG_BIT){
 		f_close(&myFiles);
+
+		WaveData.WavClearDataFlag 	= DISABLE_FLAG_BIT;
 	}
 
 }

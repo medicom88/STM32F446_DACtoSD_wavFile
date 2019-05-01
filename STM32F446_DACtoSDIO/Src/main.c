@@ -127,28 +127,33 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 //			if(WaveData.WavRepeatDataFlag == 1 && (TotalindexDAC < 150000)){
 
-		if(TotalindexDAC < 150000){
-			if(WaveData.WavRepeatDataFlag == 1){
-				if(indexDAC >= 30000){
-					WaveData.WavRepeatDataFlag = 0;
-					//HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, 0);
-					TotalindexDAC += indexDAC;
+			if((WaveData.WavRepeatDataFlag == DISABLE_FLAG_BIT) && (WaveData.WavHdrClearFlag == ENABLE_FLAG_BIT)){
+				if(indexDAC >= WaveData.WavDataSize){
+
+					if(WaveData.WavLasRepeattDataFlag == ENABLE_FLAG_BIT){
+						HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
+						WaveData.WavHdrClearFlag 		= DISABLE_FLAG_BIT;
+						WaveData.WavRepeatDataFlag 		= DISABLE_FLAG_BIT;
+						WaveData.WavLasRepeattDataFlag	= DISABLE_FLAG_BIT;
+						WaveData.WavClearDataFlag 		= ENABLE_FLAG_BIT;
+					}
+
+					WaveHdr.Data.ChunkSize -= indexDAC;
+					if(WaveHdr.Data.ChunkSize < WaveData.WavDataSize){
+						WaveData.WavDataSize = WaveHdr.Data.ChunkSize;
+						WaveData.WavLasRepeattDataFlag = ENABLE_FLAG_BIT;
+					}
+
+					WaveData.WavRepeatDataFlag = ENABLE_FLAG_BIT;
 					indexDAC = 0;
 				}
 				else{
-					HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, WaveData.Wav4K_buff_L[indexDAC]);
-					WaveData.Wav4K_buff_L[indexDAC] = 0;
+					HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, WaveData.WavData[indexDAC]);
+					WaveData.WavData[indexDAC] = 0;
 
 					indexDAC++;
 				}
 			}
-		}
-		else{
-			HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, 0);
-			WaveData.WavRepeatDataFlag = 0;
-			WaveData.WavClearDataFlag = 1;
-			WaveData.WavHdrClearFlag = 0;
-		}
 	}
 }
 /* USER CODE END 0 */
@@ -202,14 +207,15 @@ int main(void)
 
   	HAL_DAC_Start(&hdac, DAC_CHANNEL_2);
 
-  	HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, 0);
+  	HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
 
-  //SinWave test
-  	SinWave(4096, 100, mainTestArr);
+  	//SinWave test
+//  	SinWave(4096, 100, mainTestArr);
 
-  	//Enable Timer 4
-  	  	HAL_TIM_Base_Start_IT(&htim4);
+	//Enable Timer 4
+	HAL_TIM_Base_Start_IT(&htim4);
 
+	//SD File Mount
   	f_mount(&myFatFS, SDPath, 0);
 
 
@@ -223,15 +229,6 @@ int main(void)
 
 	WaveDataRead();
 
-//	if(WaveData.WavFullDataFlag == 1){
-//		for(int i=0; i<4000; i++){
-//			HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, WaveData.Wav4K_buff_L[i]);
-//			HAL_Delay(1);
-//			WaveData.Wav4K_buff_L[i] = 0;
-//		}
-//		WaveData.WavFullDataFlag = 0;
-//		HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, 0);
-//	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
