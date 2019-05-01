@@ -48,7 +48,7 @@
 
 #define PI	3.141592
 
-#define WAV_4KBYTE	4096
+#define WAV_4KBYTE	65535
 
 #define ENABLE_FLAG_BIT		1
 #define DISABLE_FLAG_BIT	0
@@ -59,9 +59,8 @@ extern TIM_HandleTypeDef htim4;
 
 
 typedef struct{
-	unsigned char 	WavData_8Bit[4096];
-	unsigned short 	WavData_16Bit[4096];
-	unsigned int 	WavData_32Bit[4096];
+	unsigned char 	WavData_8Bit[65535];
+	unsigned short 	WavData_16Bit;
 	unsigned short	WavDataSize;
 	unsigned char 	WavHdrClearFlag;
 	unsigned char 	WavOperateDataFlag;

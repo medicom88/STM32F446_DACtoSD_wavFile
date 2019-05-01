@@ -143,12 +143,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				}
 				else if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_2B){
 
-					WaveData.WavData_16Bit[IndexDAC] = WaveData.WavData_8Bit[IndexDAC+1];
-					WaveData.WavData_16Bit[IndexDAC] = (WaveData.WavData_16Bit[IndexDAC] << 8) + WaveData.WavData_8Bit[IndexDAC];
+					WaveData.WavData_16Bit = WaveData.WavData_8Bit[IndexDAC+1];
+					WaveData.WavData_16Bit = (WaveData.WavData_16Bit << 8) + WaveData.WavData_8Bit[IndexDAC];
 
-					WaveData.WavData_16Bit[IndexDAC] = WaveData.WavData_16Bit[IndexDAC] * Scale_16Bto12B / 2;
-					HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, WaveData.WavData_16Bit[IndexDAC]);
-					WaveData.WavData_16Bit[IndexDAC] = 0;
+					WaveData.WavData_16Bit = WaveData.WavData_16Bit * Scale_16Bto12B;
+					HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, WaveData.WavData_16Bit);
+					WaveData.WavData_16Bit = 0;
 
 					IndexDAC += 2;
 				}
