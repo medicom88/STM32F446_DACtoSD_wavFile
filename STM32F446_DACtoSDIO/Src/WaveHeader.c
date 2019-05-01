@@ -35,8 +35,6 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr, const TCHAR* pathFi
 {
 	int WaveFile_OK = 0;
 
-	//sd_FileRead("test_music.wav", hWavehdr, sizeof(WAVE_HDR__TypeDef));
-
 	if(f_open(&myFiles, pathFile, FA_READ) == FR_OK){
 
 		if(f_read(&myFiles, hWavehdr, sizeof(WAVE_HDR__TypeDef), &myReadBytes) == FR_OK){
@@ -99,16 +97,18 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr, const TCHAR* pathFi
 			sprintf(UartTestStr, "%d\r\n", hWavehdr->Data.ChunkSize);
 			put_str(&huart1, UartTestStr);
 
-			if(f_read(&myFiles, WaveData.Wav4K_buff_L, 4000, &myReadBytes) == FR_OK){
-				put_str(&huart1, WaveData.Wav4K_buff_L);
-			}
-			else{
-				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
-			}
+//			if(f_read(&myFiles, WaveData.Wav4K_buff_L, 30000, &myReadBytes) == FR_OK){
+//				//put_str(&huart1, WaveData.Wav4K_buff_L);
+//			}
+//			else{
+//				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
+//			}
+//
+//			f_close(&myFiles);
 
-
-
-			f_close(&myFiles);
+			WaveData.WavHdrClearFlag = 1;
+			WaveData.WavClearDataFlag = 0;
+			WaveData.WavRepeatDataFlag = 0;
 		}
 		else{
 			HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_9);
@@ -119,6 +119,26 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr, const TCHAR* pathFi
 	}
 }
 
+void WaveDataRead()
+{
+	if(WaveData.WavHdrClearFlag == 1){
+		if(WaveData.WavRepeatDataFlag == 0){
+			if(f_read(&myFiles, WaveData.Wav4K_buff_L, 30000, &myReadBytes) == FR_OK){
+				//put_str(&huart1, WaveData.Wav4K_buff_L);
+				WaveData.WavRepeatDataFlag = 1;
+			}
+			else{
+				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
+			}
+		}
+	}
+
+	if(WaveData.WavClearDataFlag == 1){
+		f_close(&myFiles);
+	}
+
+}
+
 
 
 //int scale : Wave Max Amplitude Point / ex) scale:256 -> 0~256 / scale:4096 -> 0~4096
@@ -127,7 +147,6 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr, const TCHAR* pathFi
 void SinWave(int scale, int SamplingNum, int *SineValue)
 {
 	float RadAngle;                             // Angle in Radians
-	int PSineValue[100] = {0,};
 	char uartStr[64] = {0,};
 
 	for(int MyAngle = 0; MyAngle < SamplingNum; MyAngle++) {

@@ -90,7 +90,9 @@ TIM_HandleTypeDef htim4;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-
+int mainTestArr[100] = {0,};
+int indexDAC = 0;
+int TotalindexDAC = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -111,17 +113,42 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 
 	if(htim->Instance == TIM4){
-////		Tim4Cnt++;
-////
-////		if(Tim4Cnt >= 10){
+//		Tim4Cnt++;
 //
+//		if(Tim4Cnt >= 10){
+
 //			if(indexDAC >= 100){
 //				indexDAC = 0;
 //			}
 //			HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, mainTestArr[indexDAC]);
 //			indexDAC++;
-////			Tim4Cnt = 0;
-////		}
+//			Tim4Cnt = 0;
+//		}
+
+//			if(WaveData.WavRepeatDataFlag == 1 && (TotalindexDAC < 150000)){
+
+		if(TotalindexDAC < 150000){
+			if(WaveData.WavRepeatDataFlag == 1){
+				if(indexDAC >= 30000){
+					WaveData.WavRepeatDataFlag = 0;
+					//HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, 0);
+					TotalindexDAC += indexDAC;
+					indexDAC = 0;
+				}
+				else{
+					HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, WaveData.Wav4K_buff_L[indexDAC]);
+					WaveData.Wav4K_buff_L[indexDAC] = 0;
+
+					indexDAC++;
+				}
+			}
+		}
+		else{
+			HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, 0);
+			WaveData.WavRepeatDataFlag = 0;
+			WaveData.WavClearDataFlag = 1;
+			WaveData.WavHdrClearFlag = 0;
+		}
 	}
 }
 /* USER CODE END 0 */
@@ -170,14 +197,18 @@ int main(void)
   //WaveFile HEADER INIT
   	WaveFile_Hdr_Var_Init(&WaveHdr);
 
-  //Enable Timer 4
-  	HAL_TIM_Base_Start_IT(&htim4);
+
 
 
   	HAL_DAC_Start(&hdac, DAC_CHANNEL_2);
 
+  	HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, 0);
+
   //SinWave test
-//  	SinWave(4096, 100, mainTestArr);
+  	SinWave(4096, 100, mainTestArr);
+
+  	//Enable Timer 4
+  	  	HAL_TIM_Base_Start_IT(&htim4);
 
   	f_mount(&myFatFS, SDPath, 0);
 
@@ -188,7 +219,19 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  GPIO_BT_READ(&hButton);
+	GPIO_BT_READ(&hButton);
+
+	WaveDataRead();
+
+//	if(WaveData.WavFullDataFlag == 1){
+//		for(int i=0; i<4000; i++){
+//			HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, WaveData.Wav4K_buff_L[i]);
+//			HAL_Delay(1);
+//			WaveData.Wav4K_buff_L[i] = 0;
+//		}
+//		WaveData.WavFullDataFlag = 0;
+//		HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, 0);
+//	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -332,9 +375,9 @@ static void MX_TIM4_Init(void)
 
   /* USER CODE END TIM4_Init 1 */
   htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 19-1;
+  htim4.Init.Prescaler = 119-1;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 20-1;
+  htim4.Init.Period = 32-1;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
   {

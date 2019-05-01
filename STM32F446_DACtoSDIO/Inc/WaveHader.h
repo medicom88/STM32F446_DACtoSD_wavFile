@@ -32,9 +32,15 @@
 #define PI	3.141592
 
 
+extern DAC_HandleTypeDef hdac;
+
 typedef struct{
-	unsigned char Wav4K_buff_L[4000];
+	unsigned char Wav4K_buff_L[30000];
 	unsigned char Wav4K_buff_H[4000];
+	unsigned char WavHdrClearFlag;
+	unsigned char WavOperateDataFlag;
+	unsigned char WavRepeatDataFlag;
+	unsigned char WavClearDataFlag;
 }WAV_DATA_TypeDef;
 
 
@@ -78,6 +84,8 @@ extern volatile WAV_DATA_TypeDef	WaveData;
 
 void WaveFile_Hdr_Var_Init(volatile WAVE_HDR__TypeDef *hWavehdr);
 void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr, const TCHAR* pathFile);
+void WaveDataRead();
+
 void SinWave(int scale, int SamplingNum, int *SineValue);
 
 
