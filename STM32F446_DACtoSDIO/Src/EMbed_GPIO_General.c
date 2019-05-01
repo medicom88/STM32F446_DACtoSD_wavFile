@@ -49,12 +49,12 @@ void BT_SHORT_Event(unsigned char bt_state)
 
 	switch(bt_state){
 		case 0x1E :		//0b xxx1 1110
-//			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_1);
+			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_1);
 //			sd_FileWrite(myFileName, myWriteData, sizeof(myWriteData));
-			WaveFile_HDR_Read(&WaveHdr, "test_music.wav");
+			WaveFile_HDR_Read(&WaveHdr, "SuperMario.wav");
 		break;
 		case 0x1D :		//0b xxx1 1101
-//			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_2);
+			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_2);
 //			sd_FileRead("test_music.wav", myReadData, 44);
 
 			WaveFile_HDR_Read(&WaveHdr, "test_music.wav");
@@ -62,6 +62,16 @@ void BT_SHORT_Event(unsigned char bt_state)
 		break;
 		case 0x1B :		//0b xxx1 1011
 			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_3);
+
+			f_close(&myFiles);
+
+			WaveData.WavHdrClearFlag 		= DISABLE_FLAG_BIT;
+			WaveData.WavRepeatDataFlag 		= DISABLE_FLAG_BIT;
+			WaveData.WavLasRepeattDataFlag	= DISABLE_FLAG_BIT;
+			WaveData.WavClearDataFlag 	= DISABLE_FLAG_BIT;
+
+			HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
+			WaveFile_Hdr_Var_Init(&WaveHdr);
 		break;
 		case 0x17 :		//0b xxx1 0111
 			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_4);
@@ -69,6 +79,7 @@ void BT_SHORT_Event(unsigned char bt_state)
 		break;
 		case 0x0F :		//0b xxx0 1111
 			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_5);
+			WaveFile_HDR_Read(&WaveHdr, "sample08.wav");
 		break;
 	}
 }

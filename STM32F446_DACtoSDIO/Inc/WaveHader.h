@@ -24,6 +24,23 @@
 #define WAVE_FORMAT_MPEG 			0X0050
 #define WAVE_FORMAT_EXTENSIBLE 		0XFFFE
 
+#define WAVE_SAMPLE_RATE_22050		22050
+#define WAVE_SAMPLE_RATE_44100		44100
+#define WAVE_SAMPLE_RATE_192000		192000
+
+#define WAVE_BYTE_ALIGN_1B	1
+#define WAVE_BYTE_ALIGN_2B	2
+#define WAVE_BYTE_ALIGN_3B	3
+#define WAVE_BYTE_ALIGN_4B	4
+
+//BitPerSample
+#define WAVE_BPS_8		8		//0 ~ 255			(1Byte)
+#define WAVE_BPS_16		16		//0 ~ 65,535		(2Byte)
+#define WAVE_BPS_24		24		//0 ~ 16,777,215	(3Byte)
+#define WAVE_BPS_32		32		//0 ~ 4,294,967,295	(4Byte)
+
+#define Scale_16Bto12B	0.0625	//4096/65535
+
 #define NONE_ERROR	0
 
 #define WAVE_FORMAT_MONO	1
@@ -31,16 +48,20 @@
 
 #define PI	3.141592
 
-#define WAV_4KBYTE	4000
+#define WAV_4KBYTE	4096
 
 #define ENABLE_FLAG_BIT		1
 #define DISABLE_FLAG_BIT	0
 
 
 extern DAC_HandleTypeDef hdac;
+extern TIM_HandleTypeDef htim4;
+
 
 typedef struct{
-	unsigned char 	WavData[4000];
+	unsigned char 	WavData_8Bit[4096];
+	unsigned short 	WavData_16Bit[4096];
+	unsigned int 	WavData_32Bit[4096];
 	unsigned short	WavDataSize;
 	unsigned char 	WavHdrClearFlag;
 	unsigned char 	WavOperateDataFlag;
@@ -89,6 +110,10 @@ extern volatile WAVE_HDR__TypeDef	WaveHdr;
 extern volatile WAV_DATA_TypeDef	WaveData;
 
 void WaveFile_Hdr_Var_Init(volatile WAVE_HDR__TypeDef *hWavehdr);
+void Audio_Format_Check(unsigned short AudioFormat);
+void SampleRate_Check(unsigned int SampleRate);
+void BitPerSample_Check(unsigned short BPS);
+
 void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr, const TCHAR* pathFile);
 void WaveDataRead();
 
