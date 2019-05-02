@@ -226,7 +226,7 @@ void WaveDataRead()
 	if(WaveData.WavHdrClearFlag == ENABLE_FLAG_BIT){
 
 		if(WaveData.WavRepeatDataFlag == ENABLE_FLAG_BIT){
-			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_4);
+//			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_4);
 				if(f_read(&myFiles, WaveData.WavData_8Bit, WaveData.WavDataSize, &myReadBytes) == FR_OK){
 					//put_str(&huart1, WaveData.Wav4K_buff_L);
 					WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
@@ -234,7 +234,7 @@ void WaveDataRead()
 				else{
 					HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
 				}
-				HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_4);
+//				HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_4);
 		}
 
 	}

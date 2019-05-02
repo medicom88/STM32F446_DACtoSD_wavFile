@@ -95,6 +95,19 @@ UART_HandleTypeDef huart1;
 int mainTestArr[100] = {0,};
 int IndexDAC = 0;
 int TotalindexDAC = 0;
+
+uint8_t dactest[100] = {0, 25, 50, 75, 100, 125, 150, 175, 200, 225,
+		0, 25, 50, 75, 100, 125, 150, 175, 200, 225,
+		0, 25, 50, 75, 100, 125, 150, 175, 200, 225,
+		0, 25, 50, 75, 100, 125, 150, 175, 200, 225,
+		0, 25, 50, 75, 100, 125, 150, 175, 200, 225,
+		0, 25, 50, 75, 100, 125, 150, 175, 200, 225,
+		0, 25, 50, 75, 100, 125, 150, 175, 200, 225,
+		0, 25, 50, 75, 100, 125, 150, 175, 200, 225,
+		0, 25, 50, 75, 100, 125, 150, 175, 200, 225,
+		0, 25, 50, 75, 100, 125, 150, 175, 200, 225
+
+};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -162,8 +175,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		else{
 			IndexDAC = 0;
 		}
+
 	}
+
+
 }
+
 /* USER CODE END 0 */
 
 /**
@@ -211,18 +228,30 @@ int main(void)
   //WaveFile HEADER INIT
   	WaveFile_Hdr_Var_Init(&WaveHdr);
 
-  	//DAC Start Func
-  	HAL_DAC_Start(&hdac, DAC_CHANNEL_2);
 
-  	//DAC Offset
-  	HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
 
 	//Enable Timer 4
-	HAL_TIM_Base_Start_IT(&htim4);
+//	HAL_TIM_Base_Start_IT(&htim4);
+
+	//Enable Timer 6
+	HAL_TIM_Base_Start(&htim6);
+
+//	HAL_DACEx_TriangleWaveGenerate(&hdac, DAC_CHANNEL_2, DAC_TRIANGLEAMPLITUDE_2047);
+
+	//DAC Start Func
+	HAL_DAC_Start(&hdac, DAC_CHANNEL_2);
+
+	//DAC Offset
+//	HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
+
+	HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_2, (uint32_t *)dactest, 100, DAC_ALIGN_8B_R);
+
+
+
+
 
 	//SD File Mount
-  	f_mount(&myFatFS, SDPath, 0);
-
+//	f_mount(&myFatFS, SDPath, 0);
 
   /* USER CODE END 2 */
 
@@ -230,9 +259,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	GPIO_BT_READ(&hButton);
-
-	WaveDataRead();
+//	GPIO_BT_READ(&hButton);
+//
+//	WaveDataRead();
 
     /* USER CODE END WHILE */
 
@@ -420,9 +449,9 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 119-1;
+  htim6.Init.Prescaler = 420-1;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 16-1;
+  htim6.Init.Period = 10-1;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
     Error_Handler();
