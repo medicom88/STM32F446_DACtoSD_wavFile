@@ -153,7 +153,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 					IndexDAC += 2;
 				}
 
-				HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_4);
+
 			}
 		}
 		else{
