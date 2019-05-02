@@ -146,8 +146,8 @@ void HAL_DAC_MspInit(DAC_HandleTypeDef* hdac)
     hdma_dac2.Init.Direction = DMA_MEMORY_TO_PERIPH;
     hdma_dac2.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_dac2.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_dac2.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hdma_dac2.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_dac2.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_dac2.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
     hdma_dac2.Init.Mode = DMA_NORMAL;
     hdma_dac2.Init.Priority = DMA_PRIORITY_LOW;
     hdma_dac2.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
