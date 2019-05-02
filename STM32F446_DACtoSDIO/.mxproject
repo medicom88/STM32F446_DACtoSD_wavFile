@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/Users/Hybus_EDU_3/Documents/GitHub/STM32F446_DACtoSD_wavFile/STM32F446_DACtoSDIO/STM32F446_DACtoSDIO/Inc
+HeaderPath=C:/Users/Hybus_EDU_3/Documents/GitHub/STM32F446_DACtoSD_wavFile/STM32F446_DACtoSDIO/Inc
 HeaderFiles=ffconf.h;bsp_driver_sd.h;sd_diskio.h;fatfs.h;fatfs_platform.h;stm32f4xx_it.h;stm32f4xx_hal_conf.h;main.h;
-SourcePath=C:/Users/Hybus_EDU_3/Documents/GitHub/STM32F446_DACtoSD_wavFile/STM32F446_DACtoSDIO/STM32F446_DACtoSDIO/Src
+SourcePath=C:/Users/Hybus_EDU_3/Documents/GitHub/STM32F446_DACtoSD_wavFile/STM32F446_DACtoSDIO/Src
 SourceFiles=bsp_driver_sd.c;sd_diskio.c;fatfs.c;fatfs_platform.c;stm32f4xx_it.c;stm32f4xx_hal_msp.c;main.c;
 
 [PreviousLibFiles]
