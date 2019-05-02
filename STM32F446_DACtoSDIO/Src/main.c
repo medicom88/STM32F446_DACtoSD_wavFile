@@ -129,52 +129,52 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 
 	if(htim->Instance == TIM4){
-
-		if((WaveData.WavRepeatDataFlag == DISABLE_FLAG_BIT) && (WaveData.WavHdrClearFlag == ENABLE_FLAG_BIT)){
-			if(IndexDAC >= WaveData.WavDataSize){
-
-				if(WaveData.WavLasRepeattDataFlag == ENABLE_FLAG_BIT){
-					HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
-					WaveData.WavHdrClearFlag 		= DISABLE_FLAG_BIT;
-					WaveData.WavRepeatDataFlag 		= DISABLE_FLAG_BIT;
-					WaveData.WavLasRepeattDataFlag	= DISABLE_FLAG_BIT;
-					WaveData.WavClearDataFlag 		= ENABLE_FLAG_BIT;
-				}
-
-				WaveHdr.Data.ChunkSize -= IndexDAC;
-				if(WaveHdr.Data.ChunkSize < WaveData.WavDataSize){
-					WaveData.WavDataSize = WaveHdr.Data.ChunkSize;
-					WaveData.WavLasRepeattDataFlag = ENABLE_FLAG_BIT;
-				}
-
-				WaveData.WavRepeatDataFlag = ENABLE_FLAG_BIT;
-				IndexDAC = 0;
-			}
-			else{
-				if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_1B){
-					HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, WaveData.WavData_8Bit[IndexDAC]);
-					WaveData.WavData_8Bit[IndexDAC] = 0;
-
-					IndexDAC++;
-				}
-				else if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_2B){
-
-					WaveData.WavData_16Bit = WaveData.WavData_8Bit[IndexDAC+1];
-					WaveData.WavData_16Bit = (WaveData.WavData_16Bit << 8) + WaveData.WavData_8Bit[IndexDAC];
-
-					WaveData.WavData_16Bit = WaveData.WavData_16Bit * Scale_16Bto12B;
-					HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, WaveData.WavData_16Bit);
-					WaveData.WavData_16Bit = 0;
-
-					IndexDAC += 2;
-				}
-
-
-			}
-		}
-		else{
-			IndexDAC = 0;
-		}
+		HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_4);
+//		if((WaveData.WavRepeatDataFlag == DISABLE_FLAG_BIT) && (WaveData.WavHdrClearFlag == ENABLE_FLAG_BIT)){
+//			if(IndexDAC >= WaveData.WavDataSize){
+//
+//				if(WaveData.WavLasRepeattDataFlag == ENABLE_FLAG_BIT){
+//					HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
+//					WaveData.WavHdrClearFlag 		= DISABLE_FLAG_BIT;
+//					WaveData.WavRepeatDataFlag 		= DISABLE_FLAG_BIT;
+//					WaveData.WavLasRepeattDataFlag	= DISABLE_FLAG_BIT;
+//					WaveData.WavClearDataFlag 		= ENABLE_FLAG_BIT;
+//				}
+//
+//				WaveHdr.Data.ChunkSize -= IndexDAC;
+//				if(WaveHdr.Data.ChunkSize < WaveData.WavDataSize){
+//					WaveData.WavDataSize = WaveHdr.Data.ChunkSize;
+//					WaveData.WavLasRepeattDataFlag = ENABLE_FLAG_BIT;
+//				}
+//
+//				WaveData.WavRepeatDataFlag = ENABLE_FLAG_BIT;
+//				IndexDAC = 0;
+//			}
+//			else{
+//				if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_1B){
+//					HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, WaveData.WavData_8Bit[IndexDAC]);
+//					WaveData.WavData_8Bit[IndexDAC] = 0;
+//
+//					IndexDAC++;
+//				}
+//				else if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_2B){
+//
+//					WaveData.WavData_16Bit = WaveData.WavData_8Bit[IndexDAC+1];
+//					WaveData.WavData_16Bit = (WaveData.WavData_16Bit << 8) + WaveData.WavData_8Bit[IndexDAC];
+//
+//					WaveData.WavData_16Bit = WaveData.WavData_16Bit * Scale_16Bto12B;
+//					HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, WaveData.WavData_16Bit);
+//					WaveData.WavData_16Bit = 0;
+//
+//					IndexDAC += 2;
+//				}
+//
+//
+//			}
+//		}
+//		else{
+//			IndexDAC = 0;
+//		}
 
 	}
 
@@ -231,10 +231,10 @@ int main(void)
 
 
 	//Enable Timer 4
-//	HAL_TIM_Base_Start_IT(&htim4);
+	HAL_TIM_Base_Start_IT(&htim4);
 
 	//Enable Timer 6
-	HAL_TIM_Base_Start(&htim6);
+//	HAL_TIM_Base_Start(&htim6);
 
 //	HAL_DACEx_TriangleWaveGenerate(&hdac, DAC_CHANNEL_2, DAC_TRIANGLEAMPLITUDE_2047);
 
@@ -347,7 +347,7 @@ static void MX_DAC_Init(void)
   }
   /**DAC channel OUT2 config 
   */
-  sConfig.DAC_Trigger = DAC_TRIGGER_T6_TRGO;
+  sConfig.DAC_Trigger = DAC_TRIGGER_T4_TRGO;
   sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
   if (HAL_DAC_ConfigChannel(&hdac, &sConfig, DAC_CHANNEL_2) != HAL_OK)
   {
@@ -406,9 +406,9 @@ static void MX_TIM4_Init(void)
 
   /* USER CODE END TIM4_Init 1 */
   htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 119-1;
+  htim4.Init.Prescaler = 420-1;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 32-1;
+  htim4.Init.Period = 10-1;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
   {
@@ -419,7 +419,7 @@ static void MX_TIM4_Init(void)
   {
     Error_Handler();
   }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
   {
@@ -449,9 +449,9 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 420-1;
+  htim6.Init.Prescaler = 119-1;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 10-1;
+  htim6.Init.Period = 16-1;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
     Error_Handler();

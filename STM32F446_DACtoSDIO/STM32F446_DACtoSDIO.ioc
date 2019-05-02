@@ -1,5 +1,5 @@
 #MicroXplorer Configuration settings - do not modify
-DAC.DAC_Trigger2=DAC_TRIGGER_T6_TRGO
+DAC.DAC_Trigger2=DAC_TRIGGER_T4_TRGO
 DAC.IPParameters=DAC_Trigger2
 Dma.DAC2.2.Direction=DMA_MEMORY_TO_PERIPH
 Dma.DAC2.2.FIFOMode=DMA_FIFOMODE_DISABLE
@@ -252,9 +252,11 @@ RCC.VCOSAIInputFreq_Value=500000
 RCC.VCOSAIOutputFreq_Value=96000000
 SH.COMP_DAC2_group.0=DAC_OUT2,DAC_OUT2
 SH.COMP_DAC2_group.ConfNb=1
-TIM4.IPParameters=Prescaler,Period
+TIM4.IPParameters=Prescaler,Period,TIM_MasterSlaveMode,TIM_MasterOutputTrigger
 TIM4.Period=32-1
 TIM4.Prescaler=119-1
+TIM4.TIM_MasterOutputTrigger=TIM_TRGO_UPDATE
+TIM4.TIM_MasterSlaveMode=TIM_MASTERSLAVEMODE_DISABLE
 TIM6.IPParameters=Prescaler,Period,TIM_MasterOutputTrigger
 TIM6.Period=16-1
 TIM6.Prescaler=119-1
