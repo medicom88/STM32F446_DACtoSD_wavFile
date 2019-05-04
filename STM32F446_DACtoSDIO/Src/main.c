@@ -137,14 +137,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //					HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
 //					WaveData.WavHdrClearFlag 		= DISABLE_FLAG_BIT;
 //					WaveData.WavRepeatDataFlag 		= DISABLE_FLAG_BIT;
-//					WaveData.WavLasRepeattDataFlag	= DISABLE_FLAG_BIT;
+//					WaveData.WavLasRepeatDataFlag	= DISABLE_FLAG_BIT;
 //					WaveData.WavClearDataFlag 		= ENABLE_FLAG_BIT;
 //				}
 //
 //				WaveHdr.Data.ChunkSize -= IndexDAC;
 //				if(WaveHdr.Data.ChunkSize < WaveData.WavDataSize){
 //					WaveData.WavDataSize = WaveHdr.Data.ChunkSize;
-//					WaveData.WavLasRepeattDataFlag = ENABLE_FLAG_BIT;
+//					WaveData.WavLasRepeatDataFlag = ENABLE_FLAG_BIT;
 //				}
 //
 //				WaveData.WavRepeatDataFlag = ENABLE_FLAG_BIT;
@@ -244,10 +244,7 @@ int main(void)
 	//DAC Offset
 //	HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
 
-	HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_2, (uint32_t *)dactest, 100, DAC_ALIGN_8B_R);
-
-
-
+	HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_2, (uint32_t *)dactest, 100, DAC_ALIGN_12B_R);
 
 
 	//SD File Mount

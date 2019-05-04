@@ -177,7 +177,7 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr, const TCHAR* pathFi
 				//SampleRate Check
 				SampleRate_Check(hWavehdr->Fmt.SampleRate);
 
-				//BlockAlign Check
+
 
 				//BitPerSample Check
 				BitPerSample_Check(hWavehdr->Fmt.BitPerSample);
@@ -207,10 +207,30 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr, const TCHAR* pathFi
 
 			WaveData.WavHdrClearFlag		= ENABLE_FLAG_BIT;
 			WaveData.WavRepeatDataFlag 		= ENABLE_FLAG_BIT;
-			WaveData.WavLasRepeattDataFlag	= DISABLE_FLAG_BIT;
+			WaveData.WavLasRepeatDataFlag	= DISABLE_FLAG_BIT;
 			WaveData.WavClearDataFlag 		= DISABLE_FLAG_BIT;
 
-			WaveData.WavDataSize = WAV_4KBYTE;
+			WaveData.WavDataSize = WAV_1KBYTE;
+
+
+			//BlockAlign Check
+
+			if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_1B){
+				if(f_read(&myFiles, WaveData.WavData_8Bit[0], WaveData.WavDataSize, &myReadBytes) == FR_OK){
+					WaveData.WavCrossRepeatDataFlag = FILL_BUFF_0;
+				}
+				else{
+					HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
+				}
+			}
+			else if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_1B){
+				if(f_read(&myFiles, WaveData.WavData_16Bit[0], WaveData.WavDataSize*2, &myReadBytes) == FR_OK){
+					WaveData.WavCrossRepeatDataFlag = FILL_BUFF_0;
+				}
+				else{
+					HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
+				}
+			}
 		}
 		else{
 			HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_9);
@@ -226,15 +246,43 @@ void WaveDataRead()
 	if(WaveData.WavHdrClearFlag == ENABLE_FLAG_BIT){
 
 		if(WaveData.WavRepeatDataFlag == ENABLE_FLAG_BIT){
-//			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_4);
-				if(f_read(&myFiles, WaveData.WavData_8Bit, WaveData.WavDataSize, &myReadBytes) == FR_OK){
-					//put_str(&huart1, WaveData.Wav4K_buff_L);
-					WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
+
+			if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_1B){
+				if(WaveData.WavCrossRepeatDataFlag == FILL_BUFF_1){
+					if(f_read(&myFiles, WaveData.WavData_8Bit[0], WaveData.WavDataSize, &myReadBytes) == FR_OK){
+						WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
+					}
+					else{
+						HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
+					}
 				}
-				else{
-					HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
+				else if(WaveData.WavCrossRepeatDataFlag == FILL_BUFF_0){
+					if(f_read(&myFiles, WaveData.WavData_8Bit[1], WaveData.WavDataSize, &myReadBytes) == FR_OK){
+						WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
+					}
+					else{
+						HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
+					}
 				}
-//				HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_4);
+			}
+			if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_2B){
+				if(WaveData.WavCrossRepeatDataFlag == FILL_BUFF_1){
+					if(f_read(&myFiles, WaveData.WavData_16Bit[0], WaveData.WavDataSize*2, &myReadBytes) == FR_OK){
+						WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
+					}
+					else{
+						HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
+					}
+				}
+				else if(WaveData.WavCrossRepeatDataFlag == FILL_BUFF_0){
+					if(f_read(&myFiles, WaveData.WavData_16Bit[1], WaveData.WavDataSize*2, &myReadBytes) == FR_OK){
+						WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
+					}
+					else{
+						HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
+					}
+				}
+			}
 		}
 
 	}

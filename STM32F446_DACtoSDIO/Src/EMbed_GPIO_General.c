@@ -67,7 +67,7 @@ void BT_SHORT_Event(unsigned char bt_state)
 
 			WaveData.WavHdrClearFlag 		= DISABLE_FLAG_BIT;
 			WaveData.WavRepeatDataFlag 		= DISABLE_FLAG_BIT;
-			WaveData.WavLasRepeattDataFlag	= DISABLE_FLAG_BIT;
+			WaveData.WavLasRepeatDataFlag	= DISABLE_FLAG_BIT;
 			WaveData.WavClearDataFlag 	= DISABLE_FLAG_BIT;
 
 			HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
