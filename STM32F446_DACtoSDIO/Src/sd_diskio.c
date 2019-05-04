@@ -177,52 +177,11 @@ DSTATUS SD_status(BYTE lun)
   */
 DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
 {
-  DRESULT res = RES_ERROR;
-  ReadStatus = 0;
-  uint32_t timeout;
-#if (ENABLE_SD_DMA_CACHE_MAINTENANCE == 1)
-  uint32_t alignedAddr;
-#endif
-
-  if(BSP_SD_ReadBlocks_DMA((uint32_t*)buff,
-                           (uint32_t) (sector),
-                           count) == MSD_OK)
-  {
-    /* Wait that the reading process is completed or a timeout occurs */
-    timeout = HAL_GetTick();
-    while((ReadStatus == 0) && ((HAL_GetTick() - timeout) < SD_TIMEOUT))
-    {
-    }
-    /* incase of a timeout return error */
-    if (ReadStatus == 0)
-    {
-      res = RES_ERROR;
-    }
-    else
-    {
-      ReadStatus = 0;
-      timeout = HAL_GetTick();
-
-      while((HAL_GetTick() - timeout) < SD_TIMEOUT)
-      {
-        if (BSP_SD_GetCardState() == SD_TRANSFER_OK)
-        {
-          res = RES_OK;
-#if (ENABLE_SD_DMA_CACHE_MAINTENANCE == 1)
-            /*
-               the SCB_InvalidateDCache_by_Addr() requires a 32-Byte aligned address,
-               adjust the address and the D-Cache size to invalidate accordingly.
-             */
-            alignedAddr = (uint32_t)buff & ~0x1F;
-            SCB_InvalidateDCache_by_Addr((uint32_t*)alignedAddr, count*BLOCKSIZE + ((uint32_t)buff - alignedAddr));
-#endif
-           break;
-        }
-      }
-    }
-  }
-
-  return res;
+	if (BSP_SD_ReadBlocks_DMA((uint32_t*) buff, (uint32_t) (sector), count) != MSD_OK)
+	{
+		return RES_ERROR;
+	}
+	return RES_OK;
 }
 
 /* USER CODE BEGIN beforeWriteSection */
@@ -239,51 +198,12 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
 #if _USE_WRITE == 1
 DRESULT SD_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count)
 {
-  DRESULT res = RES_ERROR;
-  WriteStatus = 0;
-  uint32_t timeout;
-#if (ENABLE_SD_DMA_CACHE_MAINTENANCE == 1)
-  uint32_t alignedAddr;
-  /*
-   the SCB_CleanDCache_by_Addr() requires a 32-Byte aligned address
-   adjust the address and the D-Cache size to clean accordingly.
-   */
-  alignedAddr = (uint32_t)buff &  ~0x1F;
-  SCB_CleanDCache_by_Addr((uint32_t*)alignedAddr, count*BLOCKSIZE + ((uint32_t)buff - alignedAddr));
-#endif
-
-  if(BSP_SD_WriteBlocks_DMA((uint32_t*)buff,
-                            (uint32_t) (sector),
-                            count) == MSD_OK)
-  {
-    /* Wait that writing process is completed or a timeout occurs */
-
-    timeout = HAL_GetTick();
-    while((WriteStatus == 0) && ((HAL_GetTick() - timeout) < SD_TIMEOUT))
-    {
-    }
-    /* incase of a timeout return error */
-    if (WriteStatus == 0)
-    {
-      res = RES_ERROR;
-    }
-    else
-    {
-      WriteStatus = 0;
-      timeout = HAL_GetTick();
-
-      while((HAL_GetTick() - timeout) < SD_TIMEOUT)
-      {
-        if (BSP_SD_GetCardState() == SD_TRANSFER_OK)
-        {
-          res = RES_OK;
-          break;
-        }
-      }
-    }
-  }
-
-  return res;
+	if (BSP_SD_WriteBlocks_DMA((uint32_t*) buff, (uint32_t) (sector),
+	count) != MSD_OK)
+	{
+	return RES_ERROR;
+	}
+	return RES_OK;
 }
 #endif /* _USE_WRITE == 1 */
 

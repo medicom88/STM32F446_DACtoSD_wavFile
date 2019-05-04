@@ -48,7 +48,8 @@
 
 #define PI	3.141592
 
-#define WAV_1KBYTE	1024
+#define WAV_1K_BYTE	1024
+#define WAV_2K_BYTE	512
 
 #define ENABLE_FLAG_BIT		1
 #define DISABLE_FLAG_BIT	0
@@ -56,21 +57,42 @@
 #define FILL_BUFF_0		1
 #define FILL_BUFF_1		2
 
+#define VOLUM_LEVEL_1	0
+#define VOLUM_LEVEL_2	1
+#define VOLUM_LEVEL_3	2
+#define VOLUM_LEVEL_4	3
+#define VOLUM_LEVEL_5	4
+
+#define VOLUM_LEVEL_VALUE_1		0.2
+#define VOLUM_LEVEL_VALUE_2		0.4
+#define VOLUM_LEVEL_VALUE_3		0.6
+#define VOLUM_LEVEL_VALUE_4		0.8
+#define VOLUM_LEVEL_VALUE_5		1
+
 
 extern DAC_HandleTypeDef hdac;
+extern DMA_HandleTypeDef hdma_dac2;
+
 extern TIM_HandleTypeDef htim4;
 
+extern SD_HandleTypeDef hsd;
+extern DMA_HandleTypeDef hdma_sdio_rx;
+extern DMA_HandleTypeDef hdma_sdio_tx;
 
 typedef struct{
 	unsigned char 	WavData_8Bit[2][1024];
-	unsigned short 	WavData_16Bit[2][1024];
-	unsigned short	WavDataSize;
+	unsigned short 	WavData_16Bit[2][512];
+	unsigned short	WavDataSize_8Bit;
+	unsigned short	WavDataSize_16Bit;
 	unsigned char 	WavHdrClearFlag;
 	unsigned char 	WavOperateDataFlag;
 	unsigned char 	WavRepeatDataFlag;
 	unsigned char 	WavClearDataFlag;
 	unsigned char 	WavLasRepeatDataFlag;
 	unsigned char	WavCrossRepeatDataFlag;
+
+	unsigned char	WavVolumLevel;
+	float			WavVolumValue;
 }WAV_DATA_TypeDef;
 
 

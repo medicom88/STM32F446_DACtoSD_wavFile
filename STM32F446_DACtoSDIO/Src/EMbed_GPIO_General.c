@@ -51,7 +51,7 @@ void BT_SHORT_Event(unsigned char bt_state)
 		case 0x1E :		//0b xxx1 1110
 			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_1);
 //			sd_FileWrite(myFileName, myWriteData, sizeof(myWriteData));
-			WaveFile_HDR_Read(&WaveHdr, "SuperMario.wav");
+			WaveFile_HDR_Read(&WaveHdr, "sinewave.wav");
 		break;
 		case 0x1D :		//0b xxx1 1101
 			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_2);
@@ -62,24 +62,53 @@ void BT_SHORT_Event(unsigned char bt_state)
 		break;
 		case 0x1B :		//0b xxx1 1011
 			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_3);
+			WaveFile_HDR_Read(&WaveHdr, "sample08.wav");
 
+		break;
+		case 0x17 :		//0b xxx1 0111
+			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_4);
 			f_close(&myFiles);
+
+			HAL_DAC_Stop_DMA(&hdac, DAC_CHANNEL_2);
 
 			WaveData.WavHdrClearFlag 		= DISABLE_FLAG_BIT;
 			WaveData.WavRepeatDataFlag 		= DISABLE_FLAG_BIT;
 			WaveData.WavLasRepeatDataFlag	= DISABLE_FLAG_BIT;
 			WaveData.WavClearDataFlag 	= DISABLE_FLAG_BIT;
 
-			HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
 			WaveFile_Hdr_Var_Init(&WaveHdr);
-		break;
-		case 0x17 :		//0b xxx1 0111
-			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_4);
-
 		break;
 		case 0x0F :		//0b xxx0 1111
 			HAL_GPIO_TogglePin(GPIO_LED_PORT, GPIO_LED_5);
-			WaveFile_HDR_Read(&WaveHdr, "sample08.wav");
+
+			switch(WaveData.WavVolumLevel){
+				case VOLUM_LEVEL_1 :
+					WaveData.WavVolumLevel = VOLUM_LEVEL_2;
+
+					WaveData.WavVolumValue = VOLUM_LEVEL_VALUE_1;
+				break;
+				case VOLUM_LEVEL_2 :
+					WaveData.WavVolumLevel = VOLUM_LEVEL_3;
+
+					WaveData.WavVolumValue = VOLUM_LEVEL_VALUE_2;
+				break;
+				case VOLUM_LEVEL_3 :
+					WaveData.WavVolumLevel = VOLUM_LEVEL_4;
+
+					WaveData.WavVolumValue = VOLUM_LEVEL_VALUE_3;
+				break;
+				case VOLUM_LEVEL_4 :
+					WaveData.WavVolumLevel = VOLUM_LEVEL_5;
+
+					WaveData.WavVolumValue = VOLUM_LEVEL_VALUE_4;
+				break;
+				case VOLUM_LEVEL_5 :
+					WaveData.WavVolumLevel = VOLUM_LEVEL_1;
+
+					WaveData.WavVolumValue = VOLUM_LEVEL_VALUE_5;
+				break;
+			}
+
 		break;
 	}
 }

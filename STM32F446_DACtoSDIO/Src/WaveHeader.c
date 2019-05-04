@@ -22,6 +22,8 @@
 volatile WAVE_HDR__TypeDef WaveHdr;
 volatile WAV_DATA_TypeDef	WaveData;
 
+volatile unsigned short Index_Data = 0;
+
 
 void WaveFile_Hdr_Var_Init(volatile WAVE_HDR__TypeDef *hWavehdr)
 {
@@ -89,7 +91,7 @@ void SampleRate_Check(unsigned int SampleRate)
 		break;
 		case WAVE_SAMPLE_RATE_44100 : 		//44,117Hz(APB1CLK:84MHz)
 			htim4.Init.Prescaler = 119-1;
-			htim4.Init.Period = 16-1;
+			htim4.Init.Period = 8-1;
 			put_str(&huart1, (uint8_t *)"WAVE_SAMPLE_RATE_44100\n");
 		break;
 		case WAVE_SAMPLE_RATE_192000 : 		//192,219Hz(APB1CLK:84MHz)
@@ -177,8 +179,6 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr, const TCHAR* pathFi
 				//SampleRate Check
 				SampleRate_Check(hWavehdr->Fmt.SampleRate);
 
-
-
 				//BitPerSample Check
 				BitPerSample_Check(hWavehdr->Fmt.BitPerSample);
 
@@ -193,44 +193,39 @@ void WaveFile_HDR_Read(volatile WAVE_HDR__TypeDef *hWavehdr, const TCHAR* pathFi
 				put_str(&huart1, (uint8_t *)"DATA_ERROR\n");
 			}
 
-//			sprintf(UartTestStr, "%d\r\n", hWavehdr->Data.ChunkSize);
-//			put_str(&huart1, UartTestStr);
-
-//			if(f_read(&myFiles, WaveData.Wav4K_buff_L, 30000, &myReadBytes) == FR_OK){
-//				//put_str(&huart1, WaveData.Wav4K_buff_L);
-//			}
-//			else{
-//				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
-//			}
-//
-//			f_close(&myFiles);
+			//BlockAlign Check & Init Buffer 1 Gather Data
+			if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_1B){
+				WaveData.WavDataSize_8Bit = WAV_1K_BYTE;
+				if(f_read(&myFiles, WaveData.WavData_8Bit[0], WaveData.WavDataSize_8Bit, &myReadBytes) == FR_OK){
+					for(Index_Data=0; Index_Data<WaveData.WavDataSize_8Bit; Index_Data++)
+					{
+						WaveData.WavData_8Bit[0][Index_Data] = WaveData.WavData_8Bit[0][Index_Data] * WaveData.WavVolumValue;
+					}
+					WaveData.WavCrossRepeatDataFlag = FILL_BUFF_0;
+				}
+				else{
+					HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
+				}
+			}
+			else if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_2B){
+				WaveData.WavDataSize_16Bit = WAV_2K_BYTE;
+				if(f_read(&myFiles, WaveData.WavData_16Bit[0], WaveData.WavDataSize_16Bit, &myReadBytes) == FR_OK){
+//					for(Index_Data=0; Index_Data<WaveData.WavDataSize_16Bit; Index_Data++)
+//					{
+//						WaveData.WavData_16Bit[0][Index_Data] = WaveData.WavData_16Bit[0][Index_Data] * Scale_16Bto12B * WaveData.WavVolumValue;
+//					}
+					WaveData.WavCrossRepeatDataFlag = FILL_BUFF_0;
+				}
+				else{
+					HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
+				}
+			}
 
 			WaveData.WavHdrClearFlag		= ENABLE_FLAG_BIT;
 			WaveData.WavRepeatDataFlag 		= ENABLE_FLAG_BIT;
 			WaveData.WavLasRepeatDataFlag	= DISABLE_FLAG_BIT;
 			WaveData.WavClearDataFlag 		= DISABLE_FLAG_BIT;
 
-			WaveData.WavDataSize = WAV_1KBYTE;
-
-
-			//BlockAlign Check
-
-			if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_1B){
-				if(f_read(&myFiles, WaveData.WavData_8Bit[0], WaveData.WavDataSize, &myReadBytes) == FR_OK){
-					WaveData.WavCrossRepeatDataFlag = FILL_BUFF_0;
-				}
-				else{
-					HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
-				}
-			}
-			else if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_1B){
-				if(f_read(&myFiles, WaveData.WavData_16Bit[0], WaveData.WavDataSize*2, &myReadBytes) == FR_OK){
-					WaveData.WavCrossRepeatDataFlag = FILL_BUFF_0;
-				}
-				else{
-					HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
-				}
-			}
 		}
 		else{
 			HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_9);
@@ -249,38 +244,75 @@ void WaveDataRead()
 
 			if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_1B){
 				if(WaveData.WavCrossRepeatDataFlag == FILL_BUFF_1){
-					if(f_read(&myFiles, WaveData.WavData_8Bit[0], WaveData.WavDataSize, &myReadBytes) == FR_OK){
-						WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
+
+					HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_2, (uint32_t *)WaveData.WavData_8Bit[1], WaveData.WavDataSize_8Bit, DAC_ALIGN_8B_R);
+					WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
+
+					if(f_read(&myFiles, WaveData.WavData_8Bit[0], WaveData.WavDataSize_8Bit, &myReadBytes) == FR_OK){
+						for(Index_Data=0; Index_Data<WaveData.WavDataSize_8Bit; Index_Data++)
+						{
+							WaveData.WavData_8Bit[0][Index_Data] = WaveData.WavData_8Bit[0][Index_Data] * WaveData.WavVolumValue;
+						}
 					}
 					else{
 						HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
 					}
+					WaveData.WavCrossRepeatDataFlag = FILL_BUFF_0;
 				}
 				else if(WaveData.WavCrossRepeatDataFlag == FILL_BUFF_0){
-					if(f_read(&myFiles, WaveData.WavData_8Bit[1], WaveData.WavDataSize, &myReadBytes) == FR_OK){
-						WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
+
+					HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_2, (uint32_t *)WaveData.WavData_8Bit[0], WaveData.WavDataSize_8Bit, DAC_ALIGN_8B_R);
+					WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
+
+					if(f_read(&myFiles, WaveData.WavData_8Bit[1], WaveData.WavDataSize_8Bit, &myReadBytes) == FR_OK){
+						for(Index_Data=0; Index_Data<WaveData.WavDataSize_8Bit; Index_Data++)
+						{
+							WaveData.WavData_8Bit[1][Index_Data] = WaveData.WavData_8Bit[1][Index_Data] * WaveData.WavVolumValue;
+						}
 					}
 					else{
 						HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
 					}
+					WaveData.WavCrossRepeatDataFlag = FILL_BUFF_1;
 				}
 			}
+
+
 			if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_2B){
 				if(WaveData.WavCrossRepeatDataFlag == FILL_BUFF_1){
-					if(f_read(&myFiles, WaveData.WavData_16Bit[0], WaveData.WavDataSize*2, &myReadBytes) == FR_OK){
-						WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
+
+					HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_2, (uint32_t *)WaveData.WavData_16Bit[1], WaveData.WavDataSize_16Bit, DAC_ALIGN_12B_R);
+					WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
+
+					if(f_read(&myFiles, WaveData.WavData_16Bit[0], WaveData.WavDataSize_16Bit, &myReadBytes) == FR_OK){
+//						for(Index_Data=0; Index_Data<WaveData.WavDataSize_16Bit; Index_Data++)
+//						{
+////							WaveData.WavData_16Bit[0][Index_Data] = (unsigned short)((unsigned int)(WaveData.WavData_16Bit[1][Index_Data] * 4096) / 65535); // * Scale_16Bto12B; //* WaveData.WavVolumValue;
+//						}
+//						HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_9);
 					}
 					else{
 						HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
 					}
+					WaveData.WavCrossRepeatDataFlag = FILL_BUFF_0;
 				}
 				else if(WaveData.WavCrossRepeatDataFlag == FILL_BUFF_0){
-					if(f_read(&myFiles, WaveData.WavData_16Bit[1], WaveData.WavDataSize*2, &myReadBytes) == FR_OK){
-						WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
+
+					HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_2, (uint32_t *)WaveData.WavData_16Bit[0], WaveData.WavDataSize_16Bit, DAC_ALIGN_12B_R);
+					WaveData.WavRepeatDataFlag = DISABLE_FLAG_BIT;
+
+					if(f_read(&myFiles, WaveData.WavData_16Bit[1], WaveData.WavDataSize_16Bit, &myReadBytes) == FR_OK){
+//						for(Index_Data=0; Index_Data<WaveData.WavDataSize_16Bit; Index_Data++)
+//						{
+//		//					WaveData.WavData_16Bit[1][Index_Data] = (unsigned short)((unsigned int)(WaveData.WavData_16Bit[1][Index_Data] * 4096) / 65535); //* Scale_16Bto12B; // * WaveData.WavVolumValue;
+//
+//						}
+//						HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_9);
 					}
 					else{
 						HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_8);
 					}
+					WaveData.WavCrossRepeatDataFlag = FILL_BUFF_1;
 				}
 			}
 		}
@@ -288,6 +320,7 @@ void WaveDataRead()
 	}
 
 	if(WaveData.WavClearDataFlag == ENABLE_FLAG_BIT){
+		HAL_DAC_Stop_DMA(&hdac, DAC_CHANNEL_2);
 		f_close(&myFiles);
 
 		WaveData.WavClearDataFlag 	= DISABLE_FLAG_BIT;
