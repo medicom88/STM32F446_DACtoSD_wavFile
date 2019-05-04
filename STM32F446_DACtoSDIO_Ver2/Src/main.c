@@ -143,10 +143,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			else{
 				if(WaveHdr.Fmt.BlockAlign == WAVE_BYTE_ALIGN_1B){
 					if(WaveData.WavCrossRepeatDataFlag == FILL_BUFF_0){
+
+						WaveData.WavData_8Bit[FILL_BUFF_1][IndexDAC] = WaveData.WavData_8Bit[FILL_BUFF_1][IndexDAC] * WaveData.WavVolumValue;
 						HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, WaveData.WavData_8Bit[FILL_BUFF_1][IndexDAC]);
 						WaveData.WavData_8Bit[FILL_BUFF_1][IndexDAC] = 0;
 					}
 					else{
+						WaveData.WavData_8Bit[FILL_BUFF_0][IndexDAC] = WaveData.WavData_8Bit[FILL_BUFF_0][IndexDAC] * WaveData.WavVolumValue;
 						HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_8B_R, WaveData.WavData_8Bit[FILL_BUFF_0][IndexDAC]);
 						WaveData.WavData_8Bit[FILL_BUFF_0][IndexDAC] = 0;
 					}
@@ -159,7 +162,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 						WaveData.WavData_16Bit[FILL_BUFF_1] = WaveData.WavData_8Bit[FILL_BUFF_1][IndexDAC+1];
 						WaveData.WavData_16Bit[FILL_BUFF_1] = (WaveData.WavData_16Bit[FILL_BUFF_1] << 8) + WaveData.WavData_8Bit[FILL_BUFF_1][IndexDAC];
 
-						WaveData.WavData_16Bit[FILL_BUFF_1] = WaveData.WavData_16Bit[FILL_BUFF_1] * Scale_16Bto12B;
+						WaveData.WavData_16Bit[FILL_BUFF_1] = WaveData.WavData_16Bit[FILL_BUFF_1] * Scale_16Bto12B * WaveData.WavVolumValue;
 						HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, WaveData.WavData_16Bit[FILL_BUFF_1]);
 						WaveData.WavData_16Bit[FILL_BUFF_1] = 0;
 					}
@@ -167,7 +170,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 						WaveData.WavData_16Bit[FILL_BUFF_0] = WaveData.WavData_8Bit[FILL_BUFF_0][IndexDAC+1];
 						WaveData.WavData_16Bit[FILL_BUFF_0] = (WaveData.WavData_16Bit[FILL_BUFF_0] << 8) + WaveData.WavData_8Bit[FILL_BUFF_0][IndexDAC];
 
-						WaveData.WavData_16Bit[FILL_BUFF_0] = WaveData.WavData_16Bit[FILL_BUFF_0] * Scale_16Bto12B;
+						WaveData.WavData_16Bit[FILL_BUFF_0] = WaveData.WavData_16Bit[FILL_BUFF_0] * Scale_16Bto12B * WaveData.WavVolumValue;
 						HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, WaveData.WavData_16Bit[FILL_BUFF_0]);
 						WaveData.WavData_16Bit[FILL_BUFF_0] = 0;
 					}
